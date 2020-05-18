@@ -177,9 +177,25 @@ namespace SoftLiu_TestForLiu
             {
                 if (item.Value != null)
                 {
+                    if(item.Value.Count == 1)
+                    {
+                        int id = 0;
+                        if (int.TryParse(item.Value[0].portID, out id))
+                        {
+                            fileData.Add(item.Value[0]);
+                            lineDataDir.Add(id, item.Value[0]);
+                        }
+                        else
+                        {
+                            fileData.Add(item.Value[0]);
+                        }
+                        continue;
+                    }
+                    bool isFirst = true;
                     foreach (var data in item.Value)
                     {
                         hasChange.Add(data.lineIndex);
+
                         if (!data.isPortID)
                         {
                             fileData.Add(data);
@@ -191,22 +207,31 @@ namespace SoftLiu_TestForLiu
                                 bool result = int.TryParse(data.portID, out firstPortID);
                                 if (!result) this.richTextBox1.AppendText("TryParse Error: " + string.Format("First:  行数：{0} -> {1}\r\n", data.lineIndex, data.ToString()));
                             }
-                            int portID = ++firstPortID;
-                            while (true)
+                            int portID = firstPortID;
+                            if(isFirst)
                             {
-                                if (lineDataDir.ContainsKey(portID))
+                                isFirst = false;
+
+                                fileData.Add(data);
+                                lineDataDir.Add(portID, data);
+
+                                continue;
+                            }
+                            do
+                            {
+                                if (lineDataDir.ContainsKey(portID) || allPortID.ContainsKey(portID.ToString()))
                                 {
                                     portID = ++firstPortID;
                                     continue;
                                 }
-
                                 data.portID = portID.ToString();
                                 fileData.Add(data);
 
                                 lineDataDir.Add(portID, data);
-
+                                firstPortID++;
                                 break;
                             }
+                            while (true);
                         }
                     }
                 }
