@@ -1,0 +1,11 @@
+#####################
+/SoftLiu_TestForLiu.csproj.user
+
+#####################
+/Library/
+.vs/
+/Temp/
+/packages/
+/SoftLiu_TestForLiu/bin/
+/SoftLiu_TestForLiu/obj/
+
