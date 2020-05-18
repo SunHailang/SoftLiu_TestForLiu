@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SoftLiu_TestForLiu.ExcelManagers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +17,12 @@ namespace SoftLiu_TestForLiu
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            comboBox1.Text = "Out";
+            comboBox2.Text = "OutputAfdxMessages";
         }
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)
@@ -177,7 +184,7 @@ namespace SoftLiu_TestForLiu
             {
                 if (item.Value != null)
                 {
-                    if(item.Value.Count == 1)
+                    if (item.Value.Count == 1)
                     {
                         int id = 0;
                         if (int.TryParse(item.Value[0].portID, out id))
@@ -208,7 +215,7 @@ namespace SoftLiu_TestForLiu
                                 if (!result) this.richTextBox1.AppendText("TryParse Error: " + string.Format("First:  行数：{0} -> {1}\r\n", data.lineIndex, data.ToString()));
                             }
                             int portID = firstPortID;
-                            if(isFirst)
+                            if (isFirst)
                             {
                                 isFirst = false;
 
@@ -261,5 +268,119 @@ namespace SoftLiu_TestForLiu
             }
             #endregion
         }
+
+        private void textBox2_DragDrop(object sender, DragEventArgs e)
+        {
+            this.textBox2.Text = string.Empty;
+            string path = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();//获得路径
+            if (this.textBox2.Text.CompareTo(path) != 0)
+            {
+                this.textBox2.Text = path; //由一个textBox显示路径
+            }
+        }
+
+        private void textBox2_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All; //重要代码：表明是所有类型的数据，比如文件路径
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string excelPath = textBox2.Text;
+            string sheet = comboBox2.Text;
+            if (string.IsNullOrEmpty(excelPath) || string.IsNullOrEmpty(sheet)) return;
+
+            DataTable dt = ExcelManager.ReadExcelToDataTable(excelPath, sheet);
+            if (dt.Rows.Count <= 1 || dt.Columns.Count <= 1)
+            {
+                Console.WriteLine("None Item Information.");
+                return;
+            }
+            int outOrin = 1;
+            switch (comboBox1.Text)
+            {
+                case "In":
+                    outOrin = 0;
+                    break;
+
+            }
+            string defaultPortName = "defaultPortName";
+            string defaultPortID = "30000";
+            List<string> columnNames = new List<string>() { "A653PortName", "DestUDP" };
+
+            string[] portNameArray = new string[dt.Rows.Count - 1];
+            string[] portIDArray = new string[dt.Rows.Count - 1];
+
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                string columnName = dt.Rows[0][i].ToString().Trim();
+
+                switch (columnName)
+                {
+                    case "A653PortName":
+                        for (int j = 1; j < dt.Rows.Count; j++)
+                        {
+                            string data = dt.Rows[j][i].ToString().Trim();
+                            if (string.IsNullOrEmpty(data))
+                            {
+                                data = defaultPortName;
+                            }
+                            portNameArray[j - 1] = data;
+                        }
+                        break;
+                    case "DestUDP":
+                        for (int j = 1; j < dt.Rows.Count; j++)
+                        {
+                            string data = dt.Rows[j][i].ToString().Trim();
+                            if (string.IsNullOrEmpty(data))
+                            {
+                                data = defaultPortID;
+                            }
+                            portIDArray[j - 1] = data;
+                        }
+                        break;
+                }
+            }
+            richTextBox1.AppendText(string.Format("name:{0} -> id:{1}\n", portNameArray.Length, portIDArray.Length));
+
+            Dictionary<string, LineData> portInfo = new Dictionary<string, LineData>();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(string.Format("[{0}]", sheet));
+            sb.Append("\n");
+            for (int i = 0; i < dt.Rows.Count - 1; i++)
+            {
+                string name = portNameArray[i];
+                string id = portIDArray[i];
+                if (portInfo.ContainsKey(name))
+                {
+                    richTextBox1.AppendText(string.Format("sane port name:{0}\n", name));
+                    continue;
+                }
+                LineData line = new LineData(true, id, name, "CENTER", outOrin.ToString(), i);
+                portInfo.Add(name, line);
+                sb.Append(line.ToString());
+                sb.Append("\n");
+            }
+            sb.Append(string.Format("[END_OF_{0}]", sheet));
+
+            FileInfo info = new FileInfo(excelPath);
+            string dic = info.Directory.FullName;
+            string writepath = Path.Combine(dic, string.Format("{0}_config_file_Center.ini", sheet));
+            if (File.Exists(writepath))
+            {
+                File.Delete(writepath);
+            }
+            using (StreamWriter sw = new StreamWriter(File.Open(writepath, FileMode.OpenOrCreate, FileAccess.Write)))
+            {
+                sw.Write(sb.ToString());
+            }
+
+            richTextBox1.AppendText("End.\n");
+        }
+
+
     }
 }
