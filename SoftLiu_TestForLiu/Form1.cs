@@ -22,7 +22,8 @@ namespace SoftLiu_TestForLiu
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBox1.Text = "Out";
-            comboBox2.Text = "OutputAfdxMessages";
+            textBox3.Text = "CENTER";
+            textBox4.Text = "OutputAfdxMessages";
         }
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)
@@ -289,98 +290,115 @@ namespace SoftLiu_TestForLiu
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string excelPath = textBox2.Text;
-            string sheet = comboBox2.Text;
-            if (string.IsNullOrEmpty(excelPath) || string.IsNullOrEmpty(sheet)) return;
-
-            DataTable dt = ExcelManager.ReadExcelToDataTable(excelPath, sheet);
-            if (dt.Rows.Count <= 1 || dt.Columns.Count <= 1)
+            try
             {
-                Console.WriteLine("None Item Information.");
-                return;
-            }
-            int outOrin = 1;
-            switch (comboBox1.Text)
-            {
-                case "In":
-                    outOrin = 0;
-                    break;
+                string excelPath = textBox2.Text;
+                string sheet = textBox4.Text.Trim();
+                string center = textBox3.Text.Trim();
+                if (string.IsNullOrEmpty(excelPath) || string.IsNullOrEmpty(sheet)) return;
 
-            }
-            string defaultPortName = "defaultPortName";
-            string defaultPortID = "30000";
-            List<string> columnNames = new List<string>() { "A653PortName", "DestUDP" };
-
-            string[] portNameArray = new string[dt.Rows.Count - 1];
-            string[] portIDArray = new string[dt.Rows.Count - 1];
-
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                string columnName = dt.Rows[0][i].ToString().Trim();
-
-                switch (columnName)
+                DataTable dt = ExcelManager.ReadExcelToDataTable(excelPath, sheet);
+                if (dt.Rows.Count <= 1 || dt.Columns.Count <= 1)
                 {
-                    case "A653PortName":
-                        for (int j = 1; j < dt.Rows.Count; j++)
-                        {
-                            string data = dt.Rows[j][i].ToString().Trim();
-                            if (string.IsNullOrEmpty(data))
-                            {
-                                data = defaultPortName;
-                            }
-                            portNameArray[j - 1] = data;
-                        }
-                        break;
-                    case "DestUDP":
-                        for (int j = 1; j < dt.Rows.Count; j++)
-                        {
-                            string data = dt.Rows[j][i].ToString().Trim();
-                            if (string.IsNullOrEmpty(data))
-                            {
-                                data = defaultPortID;
-                            }
-                            portIDArray[j - 1] = data;
-                        }
-                        break;
+                    Console.WriteLine("None Item Information.");
+                    return;
                 }
-            }
-            richTextBox1.AppendText(string.Format("name:{0} -> id:{1}\n", portNameArray.Length, portIDArray.Length));
-
-            Dictionary<string, LineData> portInfo = new Dictionary<string, LineData>();
-            StringBuilder sb = new StringBuilder();
-            sb.Append(string.Format("[{0}]", sheet));
-            sb.Append("\n");
-            for (int i = 0; i < dt.Rows.Count - 1; i++)
-            {
-                string name = portNameArray[i];
-                string id = portIDArray[i];
-                if (portInfo.ContainsKey(name))
+                int outOrin = 0;
+                switch (comboBox1.Text)
                 {
-                    richTextBox1.AppendText(string.Format("sane port name:{0}\n", name));
-                    continue;
+                    case "In":
+                        outOrin = 1;
+                        break;
+
                 }
-                LineData line = new LineData(true, id, name, "CENTER", outOrin.ToString(), i);
-                portInfo.Add(name, line);
-                sb.Append(line.ToString());
+                string defaultPortName = "defaultPortName";
+                string defaultPortID = "50000";
+                List<string> columnNames = new List<string>() { "A653PortName", "DestUDP" };
+
+                string[] centerArray = new string[] { "CENTER", "LIB", "LOB", "ROB", "RIB" };
+
+                string[] portNameArray = new string[dt.Rows.Count - 1];
+                string[] portIDArray = new string[dt.Rows.Count - 1];
+
+
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    string columnName = dt.Rows[0][i].ToString().Trim();
+
+                    switch (columnName)
+                    {
+                        case "A653PortName":
+                            for (int j = 1; j < dt.Rows.Count; j++)
+                            {
+                                string data = dt.Rows[j][i].ToString().Trim();
+                                if (string.IsNullOrEmpty(data))
+                                {
+                                    data = defaultPortName;
+                                }
+                                portNameArray[j - 1] = data;
+                            }
+                            break;
+                        case "DestUDP":
+                            for (int j = 1; j < dt.Rows.Count; j++)
+                            {
+                                string data = dt.Rows[j][i].ToString().Trim();
+                                if (string.IsNullOrEmpty(data))
+                                {
+                                    data = defaultPortID;
+                                }
+                                portIDArray[j - 1] = data;
+                            }
+                            break;
+                    }
+                }
+                richTextBox1.AppendText(string.Format("name:{0} -> id:{1}\n", portNameArray.Length, portIDArray.Length));
+
+                Dictionary<string, LineData> portInfo = new Dictionary<string, LineData>();
+                StringBuilder sb = new StringBuilder();
+                sb.Append(string.Format("[{0}]", sheet));
                 sb.Append("\n");
-            }
-            sb.Append(string.Format("[END_OF_{0}]", sheet));
+                for (int i = 0; i < dt.Rows.Count - 1; i++)
+                {
+                    string name = portNameArray[i];
+                    string id = portIDArray[i];
+                    if (portInfo.ContainsKey(name))
+                    {
+                        richTextBox1.AppendText(string.Format("sane port name:{0}\n", name));
+                        continue;
+                    }
+                    string centerinfo = center;
+                    if (outOrin == 0)
+                    {
+                        Random rd = new Random(i);
+                        int index = rd.Next(0, 5);
+                        centerinfo = centerArray[index];
+                    }
+                    LineData line = new LineData(true, id, name, centerinfo, outOrin.ToString(), i);
+                    portInfo.Add(name, line);
+                    sb.Append(line.ToString());
+                    sb.Append("\n");
+                }
+                sb.Append(string.Format("[END_OF_{0}]", sheet));
 
-            FileInfo info = new FileInfo(excelPath);
-            string dic = info.Directory.FullName;
-            string writepath = Path.Combine(dic, string.Format("{0}_config_file_Center.ini", sheet));
-            if (File.Exists(writepath))
-            {
-                File.Delete(writepath);
-            }
-            using (StreamWriter sw = new StreamWriter(File.Open(writepath, FileMode.OpenOrCreate, FileAccess.Write)))
-            {
-                sw.Write(sb.ToString());
-            }
+                FileInfo info = new FileInfo(excelPath);
+                string dic = info.Directory.FullName;
+                string writepath = Path.Combine(dic, string.Format("{0}_config_file_Center.ini", sheet));
+                if (File.Exists(writepath))
+                {
+                    File.Delete(writepath);
+                }
+                using (StreamWriter sw = new StreamWriter(File.Open(writepath, FileMode.OpenOrCreate, FileAccess.Write)))
+                {
+                    sw.Write(sb.ToString());
+                }
 
-            richTextBox1.AppendText("End.\n");
+                richTextBox1.AppendText("End.\n");
+            }
+            catch (Exception error)
+            {
+                richTextBox1.SelectionColor = Color.Red;
+                richTextBox1.AppendText(string.Format("Error:{0}\n", error.Message));
+            }
         }
-
-
     }
 }
