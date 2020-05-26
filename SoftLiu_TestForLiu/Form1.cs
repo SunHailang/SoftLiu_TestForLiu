@@ -24,6 +24,7 @@ namespace SoftLiu_TestForLiu
             comboBox1.Text = "Out";
             textBox3.Text = "CENTER";
             textBox4.Text = "OutputAfdxMessages";
+            comboBox2.Text = "55";
         }
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)
@@ -398,6 +399,102 @@ namespace SoftLiu_TestForLiu
             {
                 richTextBox1.SelectionColor = Color.Red;
                 richTextBox1.AppendText(string.Format("Error:{0}\n", error.Message));
+            }
+        }
+
+        private void textBox5_DragDrop(object sender, DragEventArgs e)
+        {
+            this.textBox5.Text = string.Empty;
+            string path = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();//获得路径
+            if (this.textBox5.Text.CompareTo(path) != 0)
+            {
+                this.textBox5.Text = path; //由一个textBox显示路径
+            }
+        }
+
+        private void textBox5_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All; //重要代码：表明是所有类型的数据，比如文件路径
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string path = this.textBox5.Text;
+            if (string.IsNullOrEmpty(path))
+            {
+                richTextBox1.SelectionColor = Color.Red;
+                richTextBox1.AppendText("文件路径不能为空!");
+                return;
+            }
+
+
+            Dictionary<string, List<LineData>> allPortID = new Dictionary<string, List<LineData>>();
+
+            Dictionary<string, List<string>> samePortID = new Dictionary<string, List<string>>();
+
+            allPortID.Clear();
+            samePortID.Clear();
+
+            List<LineData> lins = new List<LineData>();
+
+            int start = 0;
+            int.TryParse(comboBox2.Text, out start);
+            start = start * 1000;
+            int lineIndex = 0;
+            using (StreamReader sr = new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read)))
+            {
+                string line = string.Empty;
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    lineIndex++;
+                    LineData dt = new LineData(false, "", "", "", "", lineIndex);
+                    if (line.Contains("#") || !line.Contains("="))
+                    {
+                        dt = new LineData(false, "", line, "", "", lineIndex);
+                    }
+                    else
+                    {
+                        string[] data1 = line.Split('=');
+                        if (data1.Length == 2)
+                        {
+                            string data2 = data1[1];
+                            string[] data3 = data2.Split('-');
+                            if (data3.Length == 3)
+                            {
+                                string data4 = data3[1];
+                                data4 = (start++).ToString();
+
+                                dt = new LineData(true, data4, data1[0], data3[0], data3[2], lineIndex);
+                            }
+                        }
+                    }
+                    lins.Add(dt);
+                }
+            }
+            StringBuilder OverwriteSB = new StringBuilder();
+            for (int i = 0; i < lins.Count; i++)
+            {
+                LineData dt = lins[i];
+                OverwriteSB.Append(dt.ToString());
+                if (i < lins.Count - 1)
+                {
+                    OverwriteSB.Append("\n");
+                }
+            }
+
+            FileInfo fileInfo = new FileInfo(path);
+            string newPath = Path.Combine(fileInfo.Directory.FullName, "new" + Path.GetFileNameWithoutExtension(fileInfo.FullName) + fileInfo.Extension);
+            if (File.Exists(newPath))
+            {
+                File.Delete(newPath);
+            }
+            using (StreamWriter sw = new StreamWriter(File.Open(newPath, FileMode.OpenOrCreate, FileAccess.Write)))
+            {
+                sw.Write(OverwriteSB.ToString());
             }
         }
     }
