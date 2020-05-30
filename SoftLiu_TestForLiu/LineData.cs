@@ -21,13 +21,18 @@ namespace SoftLiu_TestForLiu
         public int lineIndex;
 
 
-        public LineData(bool isPort, string id, string name, string pF, string sF, int index)
+        public LineData(bool isPort, string id, string name, string pF, string sF, int index, bool sendFlagChange = false)
         {
             isPortID = isPort;
             portID = id;
             portName = name;
             portFlag = pF;
             sendFlag = sF;
+            if (!string.IsNullOrEmpty(sendFlag) && sendFlagChange)
+            {
+                if (sendFlag == "0") sendFlag = "1";
+                else if (sendFlag == "1") sendFlag = "0";
+            }
             lineIndex = index;
         }
 

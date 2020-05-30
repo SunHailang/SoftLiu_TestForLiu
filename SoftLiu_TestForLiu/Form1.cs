@@ -136,12 +136,12 @@ namespace SoftLiu_TestForLiu
 
                             if (allPortID.ContainsKey(data4))
                             {
-                                allPortID[data4].Add(new LineData(true, data4, data1[0], data3[0], data3[2], lineIndex));
+                                allPortID[data4].Add(new LineData(true, data4, data1[0], data3[0], data3[2], lineIndex, checkBox1.Checked));
                             }
                             else
                             {
                                 List<LineData> list = new List<LineData>();
-                                list.Add(new LineData(true, data4, data1[0], data3[0], data3[2], lineIndex));
+                                list.Add(new LineData(true, data4, data1[0], data3[0], data3[2], lineIndex, checkBox1.Checked));
                                 allPortID.Add(data4, list);
                             }
 
@@ -192,7 +192,24 @@ namespace SoftLiu_TestForLiu
                         if (int.TryParse(item.Value[0].portID, out id))
                         {
                             fileData.Add(item.Value[0]);
-                            lineDataDir.Add(id, item.Value[0]);
+                            if (lineDataDir.ContainsKey(id))
+                            {
+                                while (true)
+                                {
+                                    if (lineDataDir.ContainsKey(id) || allPortID.ContainsKey(id.ToString()))
+                                    {
+                                        id++;
+                                        continue;
+                                    }
+                                    break;
+                                }
+                                lineDataDir.Add(id, item.Value[0]);
+                            }
+                            else
+                            {
+                                lineDataDir.Add(id, item.Value[0]);
+                            }
+
                         }
                         else
                         {
@@ -220,6 +237,15 @@ namespace SoftLiu_TestForLiu
                             if (isFirst)
                             {
                                 isFirst = false;
+                                while (true)
+                                {
+                                    if (lineDataDir.ContainsKey(portID) || allPortID.ContainsKey(portID.ToString()))
+                                    {
+                                        portID = ++firstPortID;
+                                        continue;
+                                    }
+                                    break;
+                                }                                
 
                                 fileData.Add(data);
                                 lineDataDir.Add(portID, data);
