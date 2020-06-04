@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SoftLiu_TestForLiu.MatrixTransform;
+using SoftLiu_TestForLiu.Transform3D;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +18,7 @@ namespace SoftLiu_TestForLiu
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Transform3DForm());
         }
     }
 }
