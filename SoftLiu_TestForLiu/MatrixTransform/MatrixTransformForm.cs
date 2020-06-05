@@ -13,7 +13,7 @@ namespace SoftLiu_TestForLiu.MatrixTransform
     public partial class MatrixTransformForm : Form
     {
         Triangle m_triangle;
-
+        int degress = 0;
 
         public MatrixTransformForm()
         {
@@ -26,6 +26,9 @@ namespace SoftLiu_TestForLiu.MatrixTransform
             PointF B = new PointF(200, 200);
             PointF C = new PointF(-200, 200);
             m_triangle = new Triangle(A, B, C);
+
+            //m_triangle.Scale(0.5f);
+            //m_triangle.Rotate(90);
         }
 
         private void MatrixTransformForm_Paint(object sender, PaintEventArgs e)
@@ -33,11 +36,10 @@ namespace SoftLiu_TestForLiu.MatrixTransform
             e.Graphics.TranslateTransform(300, 300);
             m_triangle.Draw(e.Graphics);
         }
-
+        
         private void timer1_Tick(object sender, EventArgs e)
         {
-            m_triangle.Rotate(1);
-
+            m_triangle.Rotate(degress++);
             this.Invalidate();
         }
     }

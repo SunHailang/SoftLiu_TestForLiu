@@ -7,8 +7,33 @@ using System.Threading.Tasks;
 
 namespace SoftLiu_TestForLiu.Transform3D
 {
+
     public class Triangle3D
     {
+        /*
+         3D 旋转矩阵
+              x轴                y轴                  z轴
+         [1,    0,   0]     [ cos, 0, sin]      [ cos, sin, 0]
+         [0,  cos, sin]     [   0, 1,   0]      [-sin, cos, 0]
+         [0, -sin, cos]     [-sin, 0, cos]      [   0,   0, 1]
+
+         3D 平移
+                        [ 1,  0,  0, 0]
+         [x, y, z, 1] * [ 0,  1,  0, 0] = [x+dx, y+dy, z+dz, 1]
+                        [ 0,  0,  1, 0]
+                        [dx, dy, dz, 1]
+
+        3D 透视投影 (小孔成像) d表示小孔到影布的距离
+        |                                     |
+        |----d----|o|------------z------------|
+        |                                     |
+                        [ 1,  0,  0,   0]
+         [x, y, z, 1] * [ 0,  1,  0,   0] = [x, y, z, z/d] =>(透视缩略) [x/(z/d), y/(z/d)]
+                        [ 0,  0,  1, 1/d]
+                        [ 0,  0,  0,   1]
+
+        */
+
         private Vector4 a, b, c;
 
         public Vector4 A, B, C;

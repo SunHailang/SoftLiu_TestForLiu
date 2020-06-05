@@ -11,39 +11,70 @@ namespace SoftLiu_TestForLiu.MatrixTransform
     {
         PointF A, B, C;
 
+        PointF a, b, c;
+
         public Triangle(PointF _A, PointF _B, PointF _C)
         {
             this.A = _A;
             this.B = _B;
             this.C = _C;
+            this.a = A;
+            this.b = B;
+            this.c = C;
         }
 
         public void Draw(Graphics g)
         {
             Pen pen = new Pen(Color.Red, 2);
-            g.DrawLine(pen, this.A, this.B);
-            g.DrawLine(pen, this.B, this.C);
-            g.DrawLine(pen, this.C, this.A);
+            g.DrawLine(pen, this.a, this.b);
+            g.DrawLine(pen, this.b, this.c);
+            g.DrawLine(pen, this.c, this.a);
         }
 
         public void Rotate(int degrees)
         {
-            float angle = (float)(degrees / 360.0f * Math.PI);
-            this.A.X = (float)(this.A.X * Math.Cos(angle) - this.A.Y * Math.Sin(angle));
-            this.A.Y = (float)(this.A.X * Math.Sin(angle) - this.A.Y * Math.Cos(angle));
+            float angle = (float)(1 / 360.0f * Math.PI);
 
-            this.B.X = (float)(this.B.X * Math.Cos(angle) - this.B.Y * Math.Sin(angle));
-            this.B.Y = (float)(this.B.X * Math.Sin(angle) - this.B.Y * Math.Cos(angle));
-
-            this.C.X = (float)(this.C.X * Math.Cos(angle) - this.C.Y * Math.Sin(angle));
-            this.C.Y = (float)(this.C.X * Math.Sin(angle) - this.C.Y * Math.Cos(angle));
+            this.a = GetRotatePoint(this.A, angle);
+            this.b = GetRotatePoint(this.B, angle);
+            this.c = GetRotatePoint(this.C, angle);
+            this.A = a;
+            this.B = b;
+            this.C = c;
         }
-
-        private PointF GetPoint(PointF p, float angle)
+        /// <summary>
+        /// 2D 旋转矩阵
+        /// [X, Y]  *  [  cos, sin]
+        ///            [ -sin, cos]
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        private PointF GetRotatePoint(PointF p, float angle)
         {
             p.X = (float)(p.X * Math.Cos(angle) - p.Y * Math.Sin(angle));
-            p.Y = (float)(p.X * Math.Sin(angle) - p.Y * Math.Cos(angle));
+            p.Y = (float)(p.X * Math.Sin(angle) + p.Y * Math.Cos(angle));
             return p;
         }
+
+        /// <summary>
+        /// 2D 缩放
+        /// [ Kx,  0]
+        /// [  0, Ky]
+        /// </summary>
+        /// <param name="scale"></param>
+        public void Scale(float scale)
+        {
+            this.a = GetScalePoint(this.A, scale);
+            this.b = GetScalePoint(this.B, scale);
+            this.c = GetScalePoint(this.C, scale);
+        }
+        private PointF GetScalePoint(PointF p, float scale)
+        {
+            p.X = (float)(p.X * scale);
+            p.Y = (float)(p.Y * scale);
+            return p;
+        }
+
     }
 }
