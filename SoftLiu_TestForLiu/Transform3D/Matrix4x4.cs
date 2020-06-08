@@ -26,7 +26,11 @@ namespace SoftLiu_TestForLiu.Transform3D
                 pts[i - 1, j - 1] = value;
             }
         }
-
+        /// <summary>
+        /// 矩阵相乘
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
         public Matrix4x4 Mul(Matrix4x4 m)
         {
             // 当前矩阵乘以参数
@@ -52,6 +56,22 @@ namespace SoftLiu_TestForLiu.Transform3D
             newV.z = v.x * this[1, 3] + v.y * this[2, 3] + v.z * this[3, 3] + v.w * this[4, 3];
             newV.w = v.x * this[1, 4] + v.y * this[2, 4] + v.z * this[3, 4] + v.w * this[4, 4];
             return newV;
+        }
+        /// <summary>
+        /// 矩阵的转置
+        /// </summary>
+        /// <returns></returns>
+        public Matrix4x4 Transpose()
+        {
+            Matrix4x4 mT = new Matrix4x4();
+            for (int i = 1; i <= 4; i++)
+            {
+                for (int j = 1; j <= 4; j++)
+                {
+                    mT[i, j] = this[j, i];
+                }
+            }
+            return mT;
         }
     }
 }

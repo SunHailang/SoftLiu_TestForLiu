@@ -16,7 +16,9 @@ namespace SoftLiu_TestForLiu.Transform3D
 
         Matrix4x4 m_scale;
 
-        Matrix4x4 m_rotate;
+        Matrix4x4 m_rotateX;
+        Matrix4x4 m_rotateY;
+        Matrix4x4 m_rotateZ;
 
         int m_angle = 0;
 
@@ -37,7 +39,9 @@ namespace SoftLiu_TestForLiu.Transform3D
             m_scale[3, 3] = 250;
             m_scale[4, 4] = 1;
 
-            m_rotate = new Matrix4x4();
+            m_rotateX = new Matrix4x4();
+            m_rotateY = new Matrix4x4();
+            m_rotateZ = new Matrix4x4();
 
             m_view = new Matrix4x4();
             m_view[1, 1] = 1;
@@ -53,9 +57,9 @@ namespace SoftLiu_TestForLiu.Transform3D
             m_projection[3, 4] = 1.0f / 250;
             m_projection[4, 4] = 1;
 
-            Vector4 a = new Vector4(0, -0.5f, 0, 1);
-            Vector4 b = new Vector4(0.5, 0.5f, 0, 1);
-            Vector4 c = new Vector4(-0.5, 0.5f, 0, 1);
+            Vector4 a = new Vector4(0, 0.5f, 0, 1);
+            Vector4 b = new Vector4(0.5, -0.5f, 0, 1);
+            Vector4 c = new Vector4(-0.5, -0.5f, 0, 1);
             m_t = new Triangle3D(a, b, c);
             m_t.Transform(m_scale);
         }
@@ -68,16 +72,53 @@ namespace SoftLiu_TestForLiu.Transform3D
         private void timer1_Tick(object sender, EventArgs e)
         {
             double angle = (m_angle++) / 360.0f * Math.PI;
+            // ============  X
+            m_rotateX[1, 1] = 1;
+            m_rotateX[2, 2] = Math.Cos(angle);
+            m_rotateX[2, 3] = Math.Sin(angle);
+            m_rotateX[3, 2] = -Math.Sin(angle);
+            m_rotateX[3, 3] = Math.Cos(angle);
+            m_rotateX[4, 4] = 1;
+            // ============  Y
+            m_rotateY[1, 1] = Math.Cos(angle);
+            m_rotateY[1, 3] = Math.Sin(angle);
+            m_rotateY[2, 2] = 1;
+            m_rotateY[3, 1] = -Math.Sin(angle);
+            m_rotateY[3, 3] = Math.Cos(angle);
+            m_rotateY[4, 4] = 1;
+            // ============  Z
+            m_rotateZ[1, 1] = Math.Cos(angle);
+            m_rotateZ[1, 2] = Math.Sin(angle);
+            m_rotateZ[2, 1] = -Math.Sin(angle);
+            m_rotateZ[2, 2] = Math.Cos(angle);
+            m_rotateZ[3, 3] = 1;
+            m_rotateZ[4, 4] = 1;
+            //===============================
 
-            m_rotate[1, 1] = Math.Cos(angle);
-            m_rotate[1, 3] = Math.Sin(angle);
-            m_rotate[2, 2] = 1;
-            m_rotate[3, 1] = -Math.Sin(angle);
-            m_rotate[3, 3] = Math.Cos(angle);
-            m_rotate[4, 4] = 1;
+            /*
+             矩阵乘以矩阵的转置 即为撤销 矩阵的变换
+             */
+             // ==== X
+            if (checkBox1.Checked)
+            {
+                Matrix4x4 tx = m_rotateX.Transpose();
+                m_rotateX = m_rotateX.Mul(tx);
+            }
+            // ==== Y
+            if (checkBox2.Checked)
+            {
+                Matrix4x4 ty = m_rotateY.Transpose();
+                m_rotateY = m_rotateY.Mul(ty);
+            }
+            // ==== Z
+            if (checkBox3.Checked)
+            {
+                Matrix4x4 tz = m_rotateZ.Transpose();
+                m_rotateZ = m_rotateZ.Mul(tz);
+            }
 
             // 模型到世界
-            Matrix4x4 m = m_scale.Mul(m_rotate);
+            Matrix4x4 m = m_scale.Mul(m_rotateX);
             // 世界到相机
             Matrix4x4 mv = m.Mul(m_view);
             // 相机到投影

@@ -12,10 +12,11 @@ namespace SoftLiu_TestForLiu.Transform3D
     {
         /*
          3D 旋转矩阵
-              x轴                y轴                  z轴
-         [1,    0,   0]     [ cos, 0, sin]      [ cos, sin, 0]
-         [0,  cos, sin]     [   0, 1,   0]      [-sin, cos, 0]
-         [0, -sin, cos]     [-sin, 0, cos]      [   0,   0, 1]
+              x轴                    y轴                      z轴
+         [1,    0,   0, 0]     [ cos, 0, sin, 0]      [ cos, sin, 0, 0]
+         [0,  cos, sin, 0]     [   0, 1,   0, 0]      [-sin, cos, 0, 0]
+         [0, -sin, cos, 0]     [-sin, 0, cos, 0]      [   0,   0, 1, 0]
+         [0,    0,   0, 1]     [0,    0,   0, 1]      [0,    0,   0, 1]
 
          3D 平移
                         [ 1,  0,  0, 0]
@@ -83,7 +84,7 @@ namespace SoftLiu_TestForLiu.Transform3D
         {
             PointF p = new PointF();
             p.X = (float)(v.x / v.w);
-            p.Y = (float)(v.y / v.w);
+            p.Y = (float)(-v.y / v.w);
             return p;
         }
     }
