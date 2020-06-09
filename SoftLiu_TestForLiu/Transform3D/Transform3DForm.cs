@@ -13,6 +13,7 @@ namespace SoftLiu_TestForLiu.Transform3D
     public partial class Transform3DForm : Form
     {
         Triangle3D m_t;
+        Cube m_cube;
 
         Matrix4x4 m_scale;
 
@@ -57,16 +58,21 @@ namespace SoftLiu_TestForLiu.Transform3D
             m_projection[3, 4] = 1.0f / 250;
             m_projection[4, 4] = 1;
 
-            Vector4 a = new Vector4(0, 0.5f, 0, 1);
-            Vector4 b = new Vector4(0.5, -0.5f, 0, 1);
-            Vector4 c = new Vector4(-0.5, -0.5f, 0, 1);
-            m_t = new Triangle3D(a, b, c);
-            m_t.Transform(m_scale);
+            //Vector4 a = new Vector4(0, 0.5f, 0, 1);
+            //Vector4 b = new Vector4(0.5, -0.5f, 0, 1);
+            //Vector4 c = new Vector4(-0.5, -0.5f, 0, 1);
+            //m_t = new Triangle3D(a, b, c);
+            //m_t.Transform(m_scale);
+
+            m_cube = new Cube();
+            m_cube.Transform(m_scale);
         }
 
         private void Transform3DForm_Paint(object sender, PaintEventArgs e)
         {
-            m_t.Draw(e.Graphics);
+            e.Graphics.TranslateTransform(300, 300);
+            //m_t.Draw(e.Graphics);
+            m_cube.Draw(e.Graphics, checkBox4.Checked);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -98,7 +104,7 @@ namespace SoftLiu_TestForLiu.Transform3D
             /*
              矩阵乘以矩阵的转置 即为撤销 矩阵的变换
              */
-             // ==== X
+            // ==== X
             if (checkBox1.Checked)
             {
                 Matrix4x4 tx = m_rotateX.Transpose();
@@ -116,15 +122,20 @@ namespace SoftLiu_TestForLiu.Transform3D
                 Matrix4x4 tz = m_rotateZ.Transpose();
                 m_rotateZ = m_rotateZ.Mul(tz);
             }
-
+            Matrix4x4 mAll = m_rotateX.Mul(m_rotateY.Mul(m_rotateZ));
             // 模型到世界
-            Matrix4x4 m = m_scale.Mul(m_rotateX);
+            Matrix4x4 m = m_scale.Mul(mAll);
+            Vector4 L = new Vector4(-1, 1, -1, 0);
+            //m_t.CalculateLighting(m, L);
+            m_cube.CalculateLighting(m, L);
+
             // 世界到相机
             Matrix4x4 mv = m.Mul(m_view);
             // 相机到投影
             Matrix4x4 mvp = mv.Mul(m_projection);
 
-            m_t.Transform(mvp);
+            //m_t.Transform(mvp);
+            m_cube.Transform(mvp);
 
             this.Invalidate();
         }

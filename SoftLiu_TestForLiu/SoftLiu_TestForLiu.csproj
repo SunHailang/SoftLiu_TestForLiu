@@ -63,6 +63,7 @@
     <Compile Include="LineData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transform3D\Cube.cs" />
     <Compile Include="Transform3D\Matrix4x4.cs" />
     <Compile Include="Transform3D\Transform3DForm.cs">
       <SubType>Form</SubType>

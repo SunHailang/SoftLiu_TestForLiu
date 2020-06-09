@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +40,8 @@ namespace SoftLiu_TestForLiu.Transform3D
 
         public Vector4 A, B, C;
 
+        float dot;
+        bool cullBack;
         public Triangle3D()
         {
 
@@ -61,13 +64,41 @@ namespace SoftLiu_TestForLiu.Transform3D
             this.b = m.Mul(this.B);
             this.c = m.Mul(this.C);
         }
+        // 计算世界坐标系下的 法向量
+        public void CalculateLighting(Matrix4x4 _Object2World, Vector4 L)
+        {
+            this.Transform(_Object2World);
+            Vector4 u = this.b - this.a;
+            Vector4 v = this.c - this.a;
+            Vector4 normal = u.Cross(v);
+            dot = normal.Normalized.Dot(L.Normalized);
+            dot = Math.Max(0, dot);
+            dot = Math.Min(dot, 1);
+            Vector4 E = new Vector4(0, 0, -1, 0);
+            // 小于0 剔除不显示
+            cullBack = normal.Normalized.Dot(E) < 0;
+        }
 
         // 绘制三角形到 2D窗口
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, bool isLine)
         {
-            g.TranslateTransform(300, 300);
-            Pen pen = new Pen(Color.Red, 2);
-            g.DrawLines(pen, Get2DPointFArr());
+            PointF[] lins = this.Get2DPointFArr();
+            if (isLine)
+            {
+                Pen pen = new Pen(Color.Green, 2);
+                g.DrawLines(pen, lins);
+            }
+            else
+            {
+                if (!cullBack)
+                {
+                    GraphicsPath path = new GraphicsPath();
+                    path.AddLines(lins);
+                    int rgb = (int)(200 * dot) + 55;
+                    Brush brushes = new SolidBrush(Color.FromArgb(rgb, rgb, rgb));
+                    g.FillPath(brushes, path);
+                }
+            }
         }
 
         private PointF[] Get2DPointFArr()
