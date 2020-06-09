@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,119 @@ namespace SoftLiu_TestForLiu.Transform3D
         public Transform3DForm()
         {
             InitializeComponent();
+            //Bsort();
+            //Qsort();
+            Isort();
+        }
+        /// <summary>
+        /// 冒泡排序
+        /// </summary>
+        private static void Bsort()
+        {
+            int[] numbs = new int[] { 9, 8, 6, 1, 7, 5, 2, 0 };
+
+            // 比较 多少轮 numbs.Length - 1
+            for (int i = 0; i < numbs.Length - 1; i++)
+            {
+                // 后面比较好的 就不需要比较了
+                for (int j = 0; j < numbs.Length - 1 - i; j++)
+                {
+                    if (numbs[j] > numbs[j + 1])
+                    {
+                        int temp = numbs[j];
+                        numbs[j] = numbs[j + 1];
+                        numbs[j + 1] = temp;
+                    }
+                }
+            }
+            for (int i = 0; i < numbs.Length; i++)
+            {
+                Console.Write(numbs[i] + " ");
+            }
+            Console.WriteLine();
+        }
+        /// <summary>
+        /// 快速排序  递归的原理
+        /// </summary>
+        private static void Qsort()
+        {
+            int[] nums = new int[] { 6, 10, -1, 4, 9, 8, 6, 1, 7, 5, 2, 0 };
+
+            QsortY(nums, 0, nums.Length - 1);
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                Console.Write(nums[i] + " ");
+            }
+            Console.WriteLine();
+        }
+        private static void QsortY(int[] nums, int left, int right)
+        {
+            if (left >= right) return;
+
+            int baseValue = nums[left];
+            int low = left;
+            int high = right;
+
+            while (low < high)
+            {
+                while (low < high && baseValue <= nums[high])
+                {
+                    // 右边的数字 比基数小
+                    high--;
+                }
+                nums[low] = nums[high];
+                while (low < high && nums[low] <= baseValue)
+                {
+                    low++;
+                }
+                nums[high] = nums[low];
+            }
+            nums[low] = baseValue;
+            QsortY(nums, left, low);
+            QsortY(nums, low + 1, right);
+        }
+        /// <summary>
+        /// 插入排序
+        /// </summary>
+        private static void Isort()
+        {
+            int[] nums = new int[] { 6, 10, -1, 4, 9, 8, 6, 1, 7, 5, 2, 0 };
+
+            // 遍历所有的数字
+            for (int i = 1; i < nums.Length; i++)
+            {
+                // 判断当前数字比前一个数字小
+                if (nums[i] < nums[i + 1])
+                {
+                    // 把当前数字存起来
+                    int temp = nums[i];
+                    for (int j = i - 1; j >= 0 && nums[j] > temp; j--)
+                    {
+
+                        nums[j - 1] = nums[j];
+                        nums[j] = temp;
+                    }
+                }
+            }
+
+            for (int i = 0; i < nums.Length; i++)
+            {
+                Console.Write(nums[i] + " ");
+            }
+            Console.WriteLine();
+        }
+        /// <summary>
+        ///  防止闪屏 
+        /// </summary> 
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;
+                return cp;
+            }
         }
 
         private void Transform3DForm_Load(object sender, EventArgs e)
@@ -62,15 +176,18 @@ namespace SoftLiu_TestForLiu.Transform3D
             //Vector4 b = new Vector4(0.5, -0.5f, 0, 1);
             //Vector4 c = new Vector4(-0.5, -0.5f, 0, 1);
             //m_t = new Triangle3D(a, b, c);
-            //m_t.Transform(m_scale);
 
             m_cube = new Cube();
-            m_cube.Transform(m_scale);
         }
 
         private void Transform3DForm_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.TranslateTransform(300, 300);
+            Graphics g = e.Graphics;
+            g.TranslateTransform(300, 300);
+            g.SmoothingMode = SmoothingMode.AntiAlias;  //使绘图质量最高，即消除锯齿
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.CompositingQuality = CompositingQuality.HighQuality;
+
             //m_t.Draw(e.Graphics);
             m_cube.Draw(e.Graphics, checkBox4.Checked);
         }

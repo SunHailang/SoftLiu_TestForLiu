@@ -12,6 +12,12 @@ namespace SoftLiu_TestForLiu.Transform3D
     public class Triangle3D
     {
         /*
+         3D 缩放矩阵
+                        [ dx,  0,   0, 0]
+         [x, y, z, 1] * [  0,  dx,  0, 0] = [x*dx, y*dy, z*dz, 1]
+                        [  0,  0,  dz, 0]
+                        [  0,  0,   0, 1]
+
          3D 旋转矩阵
               x轴                    y轴                      z轴
          [1,    0,   0, 0]     [ cos, 0, sin, 0]      [ cos, sin, 0, 0]
