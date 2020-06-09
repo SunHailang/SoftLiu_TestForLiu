@@ -118,7 +118,7 @@ namespace SoftLiu_TestForLiu.Transform3D
                 {
                     // 把当前数字存起来
                     int temp = nums[i];
-                    for (int j = i - 1; j >= 0 && nums[j] > temp; j--)
+                    for (int j = i - 1; j >= 0; j--)
                     {
 
                         nums[j - 1] = nums[j];
