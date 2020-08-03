@@ -24,7 +24,7 @@ namespace SoftLiu_TestForLiu
             comboBox1.Text = "Out";
             textBox3.Text = "CENTER";
             textBox4.Text = "OutputAfdxMessages";
-            comboBox2.Text = "55";
+            comboBox2.Text = "50";
         }
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)

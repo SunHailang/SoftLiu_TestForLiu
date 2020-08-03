@@ -18,7 +18,7 @@ namespace SoftLiu_TestForLiu
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Transform3DForm());
+            Application.Run(new Form1());
         }
     }
 }
